@@ -1220,6 +1220,9 @@ Dispatcher.BeginInvoke(DispatcherPriority.Normal,
 		private Dictionary<String, Dictionary<IListItemEx, List<string>>> LoadBadgesData() {
 			var result = new Dictionary<String, Dictionary<IListItemEx, List<string>>>();
 			var badgesDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Badges");
+            if (!Directory.Exists(badgesDirectory)) {
+                Directory.CreateDirectory(badgesDirectory);
+            }
 			var badgesIshellItem = FileSystemListItem.ToFileSystemItem(this._ShellListView.LVHandle, badgesDirectory);
 			foreach (var item in badgesIshellItem.Where(w => w.IsFolder)) {
 				var innerDict = new Dictionary<IListItemEx, List<string>>();
