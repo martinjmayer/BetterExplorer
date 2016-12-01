@@ -132,10 +132,21 @@ namespace BetterExplorer {
 			string locale = ""; bool dmi = true;
 			Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(Current_DispatcherUnhandledException);
 			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-			//System.AppDomain.CurrentDomain.BaseDirectory
+            //System.AppDomain.CurrentDomain.BaseDirectory
+            
+            var settingsDir = Path.Combine(KnownFolders.RoamingAppData.ParsingName, @"BExplorer\");
 
-			if (!File.Exists(Path.Combine(KnownFolders.RoamingAppData.ParsingName, @"BExplorer\Settings.sqlite"))) {
-				File.Copy(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Settings.sqlite"), Path.Combine(KnownFolders.RoamingAppData.ParsingName, @"BExplorer\Settings.sqlite"));
+            // Ensure the settings directory exists and create it if missing
+            if (!Directory.Exists(settingsDir)){
+                Directory.CreateDirectory(settingsDir);
+            }
+
+            const string sqliteSettingsFilename = "Settings.sqlite";
+            var sqliteSettingsPath = Path.Combine(settingsDir, sqliteSettingsFilename);
+
+            // Ensure the SQLite settings file exists and copy it from BaseDirectory if missing
+            if (!File.Exists(sqliteSettingsPath)) {
+				File.Copy(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sqliteSettingsFilename), sqliteSettingsPath);
 			}
 
 			RegistryKey rk = Registry.CurrentUser, rks = rk.OpenSubKey(@"Software\BExplorer", true);
