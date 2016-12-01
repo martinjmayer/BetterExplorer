@@ -234,7 +234,7 @@ namespace BetterExplorer {
 
 		private void RibbonWindow_Initialized(object sender, EventArgs e) {
 			LoadInitialWindowPositionAndState();
-			LoadColorCodesFromFile();
+			LoadColorCodesFromFile(); 
 
 			AppCommands.RoutedNewTab.InputGestures.Add(new KeyGesture(Key.T, ModifierKeys.Control));
 			AppCommands.RoutedEnterInBreadCrumbCombo.InputGestures.Add(new KeyGesture(Key.E, ModifierKeys.Alt));
@@ -925,10 +925,10 @@ Dispatcher.BeginInvoke(DispatcherPriority.Normal,
 																(Action)(() => {
 																	this.beNotifyIcon.ShowBalloonTip("Information", $"It is safe to remove {item.LogicalDrive}", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
 																	var tabsForRemove = tcMain.Items.OfType<Wpf.Controls.TabItem>().Where(w => {
-																	    var root = String.Empty;
-                                                                        try {
-                                                                            root = Path.GetPathRoot(w.ShellObject.ParsingName.ToShellParsingName());
-                                                                        } catch {}
+																		var root = String.Empty;
+																		try {
+																			root = Path.GetPathRoot(w.ShellObject.ParsingName.ToShellParsingName());
+																		} catch { }
 																		return !String.IsNullOrEmpty(root) && (w.ShellObject.IsFileSystem &&
 																										root.ToLowerInvariant() == $"{DriveLetter}:\\".ToLowerInvariant());
 																	}).ToArray();
@@ -1673,8 +1673,11 @@ Dispatcher.BeginInvoke(DispatcherPriority.Normal,
 				tcMain_Setup(null, null);
 				//'set StartUp location
 				if (Application.Current.Properties["cmd"] != null && Application.Current.Properties["cmd"].ToString() != "-minimized") {
-					//if (Application.Current.Properties["cmd"].ToString() == "/nw")
-					//tcMain.NewTab(ShellListView.CurrentFolder, true);
+					var cmd = Application.Current.Properties["cmd"].ToString();
+					if (cmd != "/nw" && cmd != "/t") {
+						var sho = FileSystemListItem.ToFileSystemItem(this._ShellListView.LVHandle, cmd.ToShellParsingName());
+						tcMain.NewTab(sho, true);
+					}
 				} else {
 					InitializeInitialTabs();
 				}
@@ -3514,7 +3517,7 @@ item.IsChecked = false;
 					} else {
 						var realItem = this._ShellListView.Items.ToArray().FirstOrDefault(w => w.GetUniqueID() == oldCurrentItem.GetUniqueID());
 						if (realItem != null) {
-							this._ShellListView.SelectItems(new[] {realItem});
+							this._ShellListView.SelectItems(new[] { realItem });
 						} else {
 							if (!curentFolder.ParsingName.Contains(oldCurrentItem.ParsingName)) {
 								var parents = new List<IListItemEx>();
@@ -3523,7 +3526,7 @@ item.IsChecked = false;
 									parents.Add(parent);
 									realItem = this._ShellListView.Items.ToArray().FirstOrDefault(w => w.GetUniqueID() == parent.GetUniqueID());
 									if (realItem != null) {
-										this._ShellListView.SelectItems(new[] {realItem});
+										this._ShellListView.SelectItems(new[] { realItem });
 										break;
 									}
 									parent = parent.Parent;
@@ -3706,6 +3709,7 @@ if (e.Folder.ParsingName == KnownFolders.RecycleBin.ParsingName) {
 			this.CommandBindings.AddRange(new[]
 			{
 								new CommandBinding(AppCommands.RoutedNavigateBack, leftNavBut_Click),
+								new CommandBinding(AppCommands.RoutedNavigateFF, rightNavBut_Click),
 								new CommandBinding(AppCommands.RoutedNavigateUp, btnUpLevel_Click),
 								new CommandBinding(AppCommands.RoutedGotoSearch, GoToSearchBox),
 								new CommandBinding(AppCommands.RoutedNewTab, (sender, e) => tcMain.NewTab()),
